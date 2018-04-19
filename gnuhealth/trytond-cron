@@ -1,0 +1,4 @@
+#!/usr/bin/python
+# EASY-INSTALL-SCRIPT: 'trytond==4.2.10','trytond-cron'
+__requires__ = 'trytond==4.2.10'
+__import__('pkg_resources').run_script('trytond==4.2.10', 'trytond-cron')
