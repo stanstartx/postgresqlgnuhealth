@@ -66,10 +66,15 @@ RUN su gnuhealth -c "wget https://ftp.gnu.org/gnu/health/gnuhealth-3.2.9.tar.gz 
 COPY trytond /usr/local/bin/trytond
 COPY trytond-admin /usr/local/bin/trytond-admin
 COPY trytond-cron /usr/local/bin/trytond-cron
+COPY start_gnuhealth.sh /home/gnuhealth/start_gnuhealth.sh
+COPY gnuhealth.service /usr/lib/systemd/user/gnuhealth.service
 RUN chmod +x /usr/local/bin/trytond \
     && chmod +x /usr/local/bin/trytond-admin \
     && chmod +x /usr/local/bin/trytond-cron \
-    && chown -R root:staff /usr/local/bin
+    && chown -R root:staff /usr/local/bin \
+    && chmod +x /home/gnuhealth/start_gnuhealth.sh \
+    && chmod +x /usr/lib/systemd/user/gnuhealth.service
+
 
 
 #SAO Install
@@ -101,6 +106,27 @@ COPY trytond.conf /home/gnuhealth/gnuhealth/tryton/server/config/trytond.conf
 # COPY manager-gnuhealth.sh /home/gnuhealth/gnuhealth-{$SERIES}/tryton/server/modules
 #RUN chmod +x /home/gnuhealth/gnuhealth-{$SERIES}/tryton/server/modules/manager-gnuhealth.sh
 
+#Creating a Systemd service for the GNU Health server
+#GNU Health startup script
+ENTRYPOINT "cdexe"
+ENTRYPOINT "./trytond --verbose"
+
+#Installation of the GNU Health Client
+#Installation from Source (GNU/Linux, FreeBSD and other *NIX)
+
+ENTRYPOINT "https://ftp.gnu.org/gnu/health/gnuhealth-client-latest.tar.gz"
+ENTRYPOINT "pip2 install --user python-dateutil" \
+          && "tar -xzvf gnuhealth-client-latest.tar.gz" \
+          && "cd gnuhealth-client-3.2.5/bin./gnuhealth-client" \
+          && "pip install gnuhealth-client" \
+          && "pip install --upgrade gnuhealth-client" \
+          && "gnuhealth-client"
+
+#Initializing the GNU Health database
+ENTRYPOINT "createdb health320 --encoding=unicode --locale=C --template=template0" \
+           && "cdexe" \
+           && "./trytond-admin --all --database=database" 
+
 
 EXPOSE 8000
 
@@ -109,3 +135,4 @@ ENV TRYTOND_CONFIG=/home/gnuhealth/gnuhealth/tryton/server/config/trytond.conf
 USER gnuhealth
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["trytond"]
+
