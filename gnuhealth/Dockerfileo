@@ -75,7 +75,16 @@ RUN chmod +x /usr/local/bin/trytond \
     && chown -R root:staff /usr/local/bin \
     && chmod +x /home/gnuhealth/start_gnuhealth.sh \
     && chmod +x /usr/lib/systemd/user/gnuhealth.service \
-    && chmod 777 -R /home/gnuhealth/gnuhealth-client-3.2.6/bin
+    && chmod 777 -R /home/gnuhealth/gnuhealth-client-3.2.6
+
+
+
+
+
+
+
+
+
 
 
 
